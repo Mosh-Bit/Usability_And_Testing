@@ -21,6 +21,7 @@ sdist/
 var/
 wheels/
 Videos/
+*.csv
 share/python-wheels/
 *.egg-info/
 .installed.cfg

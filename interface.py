@@ -56,7 +56,7 @@ class VideoPlayer(QWidget):
 
     
     def openFile(self):
-        file, _ = QFileDialog.getOpenFileName(self, "Open Video", "../Videos/")
+        file, _ = QFileDialog.getOpenFileName(self, "Open Video", "Videos/")
         if file != '':
             self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(file)))
             self.playButton.setEnabled(True)
