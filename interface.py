@@ -1,4 +1,5 @@
 import sys
+import csv
 # import blink_detector_face_orientation
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QRadioButton, QButtonGroup, QMessageBox, QHBoxLayout, QSlider, QStyle, QFileDialog, QSizePolicy, QMainWindow, QSizePolicy, QAction, qApp
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
@@ -96,22 +97,24 @@ class SlideWidget(QWidget):
         self.setWindowTitle("Slide")
         self.setGeometry(100, 100, 400, 300)
 
-        self.question1 = QLabel("Question 1: Did the ad appeal to you?")
+        self.question1 = QLabel("Question 1: General interest in the product category")
 
-        self.q1_answer1_radio = QRadioButton("Option 1")
-        self.q1_answer2_radio = QRadioButton("Option 2")
-        self.q1_answer3_radio = QRadioButton("Option 3")
+        self.q1_answer1_radio = QRadioButton("Agree")
+        self.q1_answer2_radio = QRadioButton("Don't Agree")
+        self.q1_answer3_radio = QRadioButton("Neutral")
+        # think about slider
 
-        self.question2 = QLabel("Question 2: Sample Question?")
+        self.question2 = QLabel("Question 2: Was it interesting to watch?")
 
-        self.q2_answer1_radio = QRadioButton("Option 1")
-        self.q2_answer2_radio = QRadioButton("Option 2")
-        self.q2_answer3_radio = QRadioButton("Option 3")
+        self.q2_answer1_radio = QRadioButton("Yes")
+        self.q2_answer2_radio = QRadioButton("No")
+        self.q2_answer3_radio = QRadioButton("Neutral")
+        # remove neutral
 
-        self.question3 = QLabel("Question 3: Sample Question?")
+        self.question3 = QLabel("Question 3: Positive or Negative Emotion?")
 
-        self.q3_answer1_radio = QRadioButton("Option 1")
-        self.q3_answer2_radio = QRadioButton("Option 2")
+        self.q3_answer1_radio = QRadioButton("Positive")
+        self.q3_answer2_radio = QRadioButton("Negative")
         self.q3_answer3_radio = QRadioButton("Option 3")
 
         self.q1_buttonGroup = QButtonGroup()
@@ -148,12 +151,28 @@ class SlideWidget(QWidget):
         self.setLayout(layout)
 
     def submitAnswers(self):
+        # write in csv TODO
+        self.openCSV()
         selected_button = self.buttonGroup.checkedButton()
         if selected_button:
             answer = selected_button.text()
             QMessageBox.information(self, "Submission", f"Selected Answer: {answer}")
         else:
             QMessageBox.warning(self, "Submission", "Please select an answer.")
+
+    def openCSV(self):
+        csv_file = "test_new.csv"
+        headers = ["Question1", "Question2", "Question3"]
+        data = [
+            ["Value1", "Value2", "Value3"],
+            ["Value4", "Value5", "Value6"],
+            ["Value7", "Value8", "Value9"]
+            ]
+        with open(csv_file, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(headers)
+            writer.writerows(data)
+
        
 if __name__ == '__main__':
     app = QApplication(sys.argv)
