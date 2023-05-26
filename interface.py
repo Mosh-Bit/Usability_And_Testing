@@ -5,10 +5,13 @@ from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtCore import Qt, QUrl
 
-""" Sources
- https://www.codecguide.com/download_k-lite_codec_pack_basic.htm for Video encodings
- https://wiki.qt.io/How_to_Use_QPushButton
- https://doc.qt.io/qt-5/qvideowidget.html
+""" 
+Sources:
+    for Video & Audio encodings:
+    https://www.codecguide.com/download_k-lite_codec_pack_basic.htm
+    Qt5 Tutorials:
+    https://wiki.qt.io/How_to_Use_QPushButton
+    https://doc.qt.io/qt-5/qvideowidget.html
 """
 
 class VideoPlayer(QWidget):
