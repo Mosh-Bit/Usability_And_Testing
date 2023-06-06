@@ -1,5 +1,7 @@
 import sys
 import csv
+import time
+import threading
 from Blink.blink_detector import BlinkDetector
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QRadioButton, QButtonGroup, QMessageBox, QHBoxLayout, QSlider, QStyle, QFileDialog, QSizePolicy, QMainWindow, QSizePolicy, QAction, qApp
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
@@ -7,6 +9,7 @@ from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtCore import Qt, QUrl
 from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QShortcut
+from PyQt5.QtCore import QTime
 
 """ 
 Sources:
@@ -18,13 +21,16 @@ Sources:
 """
 
 class VideoPlayer(QWidget):
-    def __init__(self):
+    def __init__(self, blink):
         super().__init__()
         self.setWindowTitle("Usability & Testing - Video Player")
+        self.blink_detector = blink
         # self.setGeometry(100, 100, 800, 600)
         self.showFullScreen()
 
         self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)
+        self.mediaPlayer.positionChanged.connect(self.updatePosition)
+        self.mediaPlayer.positionChanged.connect(self.updatePosition)
 
         self.videoWidget = QVideoWidget()
 
@@ -52,7 +58,7 @@ class VideoPlayer(QWidget):
         )
 
         self.nextButton = QPushButton("Next -> Questionnaire")
-        self.nextButton.setEnabled(False)
+        self.nextButton.setEnabled(False)#
         self.nextButton.clicked.connect(self.showNextSlide)
         self.nextButton.clicked.connect(self.pauseVideo)
         self.nextButton.setStyleSheet(
@@ -89,7 +95,6 @@ class VideoPlayer(QWidget):
         self.fullScreenShortcut.activated.connect(self.makeFullScreen)
 
         self.nextSlide = None  # Initialize as None
-
     
     def openFile(self):
         file, _ = QFileDialog.getOpenFileName(self, "Open Video", "Videos/")
@@ -128,16 +133,37 @@ class VideoPlayer(QWidget):
 
     def durationChanged(self, duration):
         pass
+    
+    def updatePosition(self, position):
+        current_position = position
+
+        time = QTime(0, 0)
+        time = time.addMSecs(current_position)
+
+        print("Current Time:", time.toString("hh:mm:ss"))
+
+    def updateDuration(self, duration):
+        video_duration = duration
+
+        current_position = player.position()
+
+        frame_counter = (current_position * frame_rate) / 1000
+
+        print("Frame Counter:", frame_counter)
 
     def showNextSlide(self):
+        self.nextSlide = SlideWidget(self.blink_detector)  # Pass blink_detector instance to the next SlideWidget
+        self.nextSlide.showFullScreen()
+        self.pauseVideo()
+        self.blink_detector.stop()
+        self.hide()
         self.close()
-        self.nextSlide = SlideWidget()
-        self.nextSlide.show()
 
 class SlideWidget(QWidget):
-    def __init__(self):
+    def __init__(self, blink):
         super().__init__()
 
+        self.blink_detector = blink
         self.setWindowTitle("Slide")
         # self.setGeometry(100, 100, 400, 300)
         self.showFullScreen
@@ -253,9 +279,27 @@ class SlideWidget(QWidget):
         with open(csv_file, mode='w', newline='') as file:
             pass 
 
+
+def run_video_player(videoPlayer):
+    videoPlayer.show()
+
+def run_blink_detector(blinkDetector):
+    blinkDetector.run()
+
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    videoPlayer = VideoPlayer()
+    blinkDetector = BlinkDetector()
+    videoPlayer =  VideoPlayer(blinkDetector)
     videoPlayer.openFile()
-    videoPlayer.show()
+
+    blink_detector_thread = threading.Thread(target=run_blink_detector(blinkDetector))
+    video_player_thread = threading.Thread(target=run_video_player(videoPlayer))
+
+    blink_detector_thread.start()
+    video_player_thread.start()
+
+    blink_detector_thread.join()
+    video_player_thread.join()
+
     sys.exit(app.exec_())

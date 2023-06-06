@@ -30,6 +30,10 @@ class BlinkDetector:
         self.blink_len = 0
         self.time_passed = time.time()
 
+    def stop(self):
+        self.file.close()
+        self.cap.release()
+
     def get_face_orientation(self, results, img):
         img_h, img_w, img_c = img.shape
         face_3d = []
@@ -145,15 +149,15 @@ class BlinkDetector:
         return true_blink, start, elapsed
 
     def run(self):
-        cap = cv2.VideoCapture(0)
+        self.cap = cv2.VideoCapture(0)
         self.file = open("test_new.csv", 'w', newline='')
         self.writer = csv.writer(self.file, delimiter=';')
         self.writer.writerow(['time', 'blink', 'ratio', 'ratio_r', 'ratio_l', 'counted', 'orientation',
                               'still_closed', 'blink_length'])
         self.start_time = time.time()
 
-        while cap.isOpened():
-            success, image = cap.read()
+        while self.cap.isOpened():
+            success, image = self.cap.read()
             image = cv2.cvtColor(cv2.flip(image, 1), cv2.COLOR_BGR2RGB)
             image.flags.writeable = False
             results = self.face_mesh.process(image)
@@ -209,7 +213,7 @@ class BlinkDetector:
                 break
 
         self.file.close()
-        cap.release()
+        self.cap.release()
 
 if __name__ == '__main__':
     blink_detector = BlinkDetector()
