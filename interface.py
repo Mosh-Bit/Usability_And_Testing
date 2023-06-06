@@ -41,11 +41,9 @@ class VideoPlayer(QWidget):
                 padding: 10px 20px;
                 text-align: center;
                 text-decoration: none;
-                display: inline-block;
                 font-size: 16px;
                 margin: 4px 2px;
-                cursor: pointer;
-                border-radius: 8px;
+                border-radius: 12px;
             }
             QPushButton:checked {
                 background-color: #f44336;
@@ -66,11 +64,9 @@ class VideoPlayer(QWidget):
                 padding: 10px 20px;
                 text-align: center;
                 text-decoration: none;
-                display: inline-block;
                 font-size: 16px;
                 margin: 4px 2px;
-                cursor: pointer;
-                border-radius: 8px;
+                border-radius: 12px;
             }
             """
         )
@@ -191,11 +187,9 @@ class SlideWidget(QWidget):
                 padding: 10px 20px;
                 text-align: center;
                 text-decoration: none;
-                display: inline-block;
                 font-size: 20px;
                 margin: 4px 2px;
-                cursor: pointer;
-                border-radius: 8px;
+                border-radius: 12px;
             }
             """
         )
@@ -218,29 +212,47 @@ class SlideWidget(QWidget):
         self.setLayout(layout)
 
     def submitAnswers(self):
-        # write in csv TODO
-        self.openCSV()
-        selected_button = self.buttonGroup.checkedButton()
-        if selected_button:
-            answer = selected_button.text()
-            QMessageBox.information(self, "Submission", f"Selected Answer: {answer}")
-        else:
-            QMessageBox.warning(self, "Submission", "Please select an answer.")
+        selected_button_1 = self.q1_buttonGroup.checkedButton()
+        selected_button_2 = self.q2_buttonGroup.checkedButton()
+        selected_button_3 = self.q3_buttonGroup.checkedButton()
+        if (selected_button_1):
+            if(selected_button_2):
+                if(selected_button_3):
+                        answer_1 = selected_button_1.text()
+                        answer_2 = selected_button_2.text()
+                        answer_3 = selected_button_3.text()
+                else:
+                    QMessageBox.warning(self, "Submission", "Please select an answer in block 3.")
+            else:
+                QMessageBox.warning(self, "Submission", "Please select an answer in block 2")
+        
 
-    def openCSV(self):
-        csv_file = "test_new.csv"
-        headers = ["Question1", "Question2", "Question3"]
-        data = [
-            ["Value1", "Value2", "Value3"],
-            ["Value4", "Value5", "Value6"],
-            ["Value7", "Value8", "Value9"]
+            data = [
+            ["Answer 1: ", answer_1],
+            ["Answer 2: ", answer_2],
+            ["Answer 3: ", answer_3]
             ]
-        with open(csv_file, mode='w', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow(headers)
-            writer.writerows(data)
+            self.openCSV(data)
+            message_box = QMessageBox(QMessageBox.Information, "Submission", f"Selected Answers: {answer_1, answer_2, answer_3}", QMessageBox.Close)
+            message_box.exec_()
+            self.close()
+        else:
+            QMessageBox.warning(self, "Submission", "Please select an answer in block 1.")
 
-       
+    def openCSV(self, data):
+        csv_file = "test_new.csv"
+        self.clearCSV(csv_file)
+        if(len(data) == 0):
+            QMessageBox.warning(self, "Error", "Something went wrong, data is empty!!")
+        with open(csv_file, mode='a', newline='') as file:
+            writer = csv.writer(file)
+            for row in data:
+                writer.writerow(row)
+
+    def clearCSV(self, csv_file):
+        with open(csv_file, mode='w', newline='') as file:
+            pass 
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     videoPlayer = VideoPlayer()
