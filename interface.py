@@ -5,6 +5,8 @@ from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLa
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtCore import Qt, QUrl
+from PyQt5.QtGui import QKeySequence
+from PyQt5.QtWidgets import QShortcut
 
 """ 
 Sources:
@@ -18,43 +20,77 @@ Sources:
 class VideoPlayer(QWidget):
     def __init__(self):
         super().__init__()
-
         self.setWindowTitle("Usability & Testing - Video Player")
-        self.setGeometry(100, 100, 800, 600)
+        # self.setGeometry(100, 100, 800, 600)
+        self.showFullScreen()
 
         self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)
 
         self.videoWidget = QVideoWidget()
 
         self.playButton = QPushButton("Play")
-        self.playButton.setEnabled(False)
-        self.playButton.clicked.connect(self.playVideo)
+        self.playButton.setCheckable(True)
+        self.playButton.setChecked(False)
+        self.playButton.toggled.connect(self.playButtonToggled)
+        self.playButton.setStyleSheet(
+            """
+            QPushButton {
+                background-color: #4CAF50;
+                border: none;
+                color: white;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                margin: 4px 2px;
+                cursor: pointer;
+                border-radius: 8px;
+            }
+            QPushButton:checked {
+                background-color: #f44336;
+            }
+            """
+        )
 
-        self.pauseButton = QPushButton("Pause")
-        self.pauseButton.setEnabled(False)
-        self.pauseButton.clicked.connect(self.pauseVideo)
-
-        self.nextButton = QPushButton("Next -> Questionaire")
+        self.nextButton = QPushButton("Next -> Questionnaire")
         self.nextButton.setEnabled(False)
         self.nextButton.clicked.connect(self.showNextSlide)
         self.nextButton.clicked.connect(self.pauseVideo)
+        self.nextButton.setStyleSheet(
+            """
+            QPushButton {
+                background-color: #2196F3;
+                border: none;
+                color: white;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                margin: 4px 2px;
+                cursor: pointer;
+                border-radius: 8px;
+            }
+            """
+        )
 
-        self.layout = QVBoxLayout()
-        self.layout.addWidget(self.videoWidget)
+        layout = QVBoxLayout()
+        layout.addWidget(self.videoWidget)
+        layout.addWidget(self.playButton)
+        layout.addWidget(self.nextButton)
 
-        buttonLayout = QHBoxLayout()
-        buttonLayout.addWidget(self.playButton)
-        buttonLayout.addWidget(self.pauseButton)
-        buttonLayout.addWidget(self.nextButton)
-
-        self.layout.addLayout(buttonLayout)
-
-        self.setLayout(self.layout)
+        self.setLayout(layout)
 
         self.mediaPlayer.setVideoOutput(self.videoWidget)
         self.mediaPlayer.stateChanged.connect(self.mediaStateChanged)
         self.mediaPlayer.positionChanged.connect(self.positionChanged)
         self.mediaPlayer.durationChanged.connect(self.durationChanged)
+
+        self.exitShortcut = QShortcut(QKeySequence(Qt.Key_Escape), self)
+        self.exitShortcut.activated.connect(self.exitFullScreen)
+        self.fullScreenShortcut = QShortcut(QKeySequence(Qt.Key_F), self)
+        self.fullScreenShortcut.activated.connect(self.makeFullScreen)
 
         self.nextSlide = None  # Initialize as None
 
@@ -64,7 +100,7 @@ class VideoPlayer(QWidget):
         if file != '':
             self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(file)))
             self.playButton.setEnabled(True)
-            self.pauseButton.setEnabled(True)
+            # self.pauseButton.setEnabled(True)
             self.nextButton.setEnabled(True)
 
     def playVideo(self):
@@ -72,6 +108,18 @@ class VideoPlayer(QWidget):
 
     def pauseVideo(self):
         self.mediaPlayer.pause()
+
+    def playButtonToggled(self, checked):
+        if checked:
+            self.mediaPlayer.play()
+        else:
+            self.mediaPlayer.pause()
+
+    def exitFullScreen(self):
+        self.showNormal()
+
+    def makeFullScreen(self):
+        self.showFullScreen()
 
     def mediaStateChanged(self, state):
         if self.mediaPlayer.state() == QMediaPlayer.PlayingState:
@@ -95,7 +143,8 @@ class SlideWidget(QWidget):
         super().__init__()
 
         self.setWindowTitle("Slide")
-        self.setGeometry(100, 100, 400, 300)
+        # self.setGeometry(100, 100, 400, 300)
+        self.showFullScreen
 
         self.question1 = QLabel("Question 1: General interest in the product category")
 
@@ -120,6 +169,7 @@ class SlideWidget(QWidget):
         self.q1_buttonGroup = QButtonGroup()
         self.q2_buttonGroup = QButtonGroup()
         self.q3_buttonGroup = QButtonGroup()
+
         self.q1_buttonGroup.addButton(self.q1_answer1_radio)
         self.q1_buttonGroup.addButton(self.q1_answer2_radio)
         self.q1_buttonGroup.addButton(self.q1_answer3_radio)
@@ -132,6 +182,23 @@ class SlideWidget(QWidget):
 
         self.submitButton = QPushButton("Submit")
         self.submitButton.clicked.connect(self.submitAnswers)
+        self.submitButton.setStyleSheet(
+            """
+            QPushButton {
+                background-color: #4CAF50;
+                border: none;
+                color: black;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 20px;
+                margin: 4px 2px;
+                cursor: pointer;
+                border-radius: 8px;
+            }
+            """
+        )
 
         layout = QVBoxLayout()
         layout.addWidget(self.question1)
