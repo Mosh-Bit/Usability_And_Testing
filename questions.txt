@@ -6,3 +6,10 @@ Questions for 5 different product commercials:
 
 
 -> read.me & debug code to share with others groups
+todos:
+- restructure the questions & add ratings
+- download and include 5 videos
+- test with different orders
+- pilot study with our group members
+- think about visualization
+- email with matr.nr. for entering the lab
