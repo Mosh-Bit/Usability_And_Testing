@@ -3,7 +3,7 @@ import csv
 import time
 import threading
 from Blink.blink_detector import BlinkDetector
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QRadioButton, QButtonGroup, QMessageBox, QHBoxLayout, QSlider, QStyle, QFileDialog, QSizePolicy, QMainWindow, QSizePolicy, QAction, qApp
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QRadioButton, QButtonGroup, QMessageBox, QHBoxLayout, QSlider, QStyle, QFileDialog, QSizePolicy, QMainWindow, QSizePolicy, QAction, qApp, QSlider
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtCore import Qt, QUrl
@@ -151,12 +151,20 @@ class VideoPlayer(QWidget):
 
         print("Frame Counter:", frame_counter)
 
+    def killMediaPlayer(self):
+        self.mediaPlayer.stop()
+        # Clean up and release resources
+        self.mediaPlayer.deleteLater()
+
     def showNextSlide(self):
         self.nextSlide = SlideWidget(self.blink_detector)  # Pass blink_detector instance to the next SlideWidget
         self.nextSlide.showFullScreen()
+        self.playButton.setEnabled(False)
+        self.nextButton.setEnabled(False)
         self.pauseVideo()
+        self.killMediaPlayer()
         self.blink_detector.stop()
-        self.hide()
+        #self.hide()
         self.close()
 
 class SlideWidget(QWidget):
@@ -165,42 +173,62 @@ class SlideWidget(QWidget):
 
         self.blink_detector = blink
         self.setWindowTitle("Slide")
-        # self.setGeometry(100, 100, 400, 300)
+        self.setGeometry(100, 100, 400, 300)
         self.showFullScreen
+
+        # slider answers
+        self.sliderValue_q1 = None
+        self.sliderValue_q2 = None
+        self.sliderValue_q3 = None
 
         self.question1 = QLabel("Question 1: General interest in the product category")
 
-        self.q1_answer1_radio = QRadioButton("Agree")
-        self.q1_answer2_radio = QRadioButton("Don't Agree")
-        self.q1_answer3_radio = QRadioButton("Neutral")
+        #self.q1_answer1_radio = QRadioButton("Agree")
+        #self.q1_answer2_radio = QRadioButton("Don't Agree")
+        #self.q1_answer3_radio = QRadioButton("Neutral")
         # think about slider
+        self.slider_q1 = QSlider(Qt.Horizontal)
+        self.slider_q1.setMinimum(1)
+        self.slider_q1.setMaximum(4)
+        self.slider_q1.setTickInterval(1)
+        self.slider_q1.setTickPosition(QSlider.TicksBelow)
+        self.slider_q1.valueChanged.connect(self.updateSlider1Value)
 
         self.question2 = QLabel("Question 2: Was it interesting to watch?")
 
-        self.q2_answer1_radio = QRadioButton("Yes")
-        self.q2_answer2_radio = QRadioButton("No")
-        self.q2_answer3_radio = QRadioButton("Neutral")
+        #self.q2_answer1_radio = QRadioButton("Yes")
+        #self.q2_answer2_radio = QRadioButton("No")
+        #self.q2_answer3_radio = QRadioButton("Neutral")
         # remove neutral
+        self.slider_q2 = QSlider(Qt.Horizontal)
+        self.slider_q2.setMinimum(1)
+        self.slider_q2.setMaximum(4)
+        self.slider_q2.setTickInterval(1)
+        self.slider_q2.setTickPosition(QSlider.TicksBelow)
+        self.slider_q2.valueChanged.connect(self.updateSlider2Value)
 
         self.question3 = QLabel("Question 3: Positive or Negative Emotion?")
 
-        self.q3_answer1_radio = QRadioButton("Positive")
-        self.q3_answer2_radio = QRadioButton("Negative")
-        self.q3_answer3_radio = QRadioButton("Option 3")
+        self.slider_q3 = QSlider(Qt.Horizontal)
+        self.slider_q3.setMinimum(1)
+        self.slider_q3.setMaximum(4)
+        self.slider_q3.setTickInterval(1)
+        self.slider_q3.setTickPosition(QSlider.TicksBelow)
+        self.slider_q3.valueChanged.connect(self.updateSlider3Value)
 
-        self.q1_buttonGroup = QButtonGroup()
-        self.q2_buttonGroup = QButtonGroup()
-        self.q3_buttonGroup = QButtonGroup()
+        #self.q1_buttonGroup = QButtonGroup()
+        #self.q2_buttonGroup = QButtonGroup()
+        #self.q3_buttonGroup = QButtonGroup()
 
-        self.q1_buttonGroup.addButton(self.q1_answer1_radio)
-        self.q1_buttonGroup.addButton(self.q1_answer2_radio)
-        self.q1_buttonGroup.addButton(self.q1_answer3_radio)
-        self.q2_buttonGroup.addButton(self.q2_answer1_radio)
-        self.q2_buttonGroup.addButton(self.q2_answer2_radio)
-        self.q2_buttonGroup.addButton(self.q2_answer3_radio)
-        self.q3_buttonGroup.addButton(self.q3_answer1_radio)
-        self.q3_buttonGroup.addButton(self.q3_answer2_radio)
-        self.q3_buttonGroup.addButton(self.q3_answer3_radio)
+        #self.q1_buttonGroup.addButton(self.q1_answer1_radio)
+        #self.q1_buttonGroup.addButton(self.q1_answer2_radio)
+        #self.q1_buttonGroup.addButton(self.q1_answer3_radio)
+        #self.q2_buttonGroup.addButton(self.q2_answer1_radio)
+        #self.q2_buttonGroup.addButton(self.q2_answer2_radio)
+        #self.q2_buttonGroup.addButton(self.q2_answer3_radio)
+        #self.q3_buttonGroup.addButton(self.q3_answer1_radio)
+        #self.q3_buttonGroup.addButton(self.q3_answer2_radio)
+        #self.q3_buttonGroup.addButton(self.q3_answer3_radio)
 
         self.submitButton = QPushButton("Submit")
         self.submitButton.clicked.connect(self.submitAnswers)
@@ -222,48 +250,43 @@ class SlideWidget(QWidget):
 
         layout = QVBoxLayout()
         layout.addWidget(self.question1)
-        layout.addWidget(self.q1_answer1_radio)
-        layout.addWidget(self.q1_answer2_radio)
-        layout.addWidget(self.q1_answer3_radio)
+        layout.addWidget(self.slider_q1)
+        #layout.addWidget(self.q1_answer1_radio)
+        #layout.addWidget(self.q1_answer2_radio)
+        #layout.addWidget(self.q1_answer3_radio)
         layout.addWidget(self.question2)
-        layout.addWidget(self.q2_answer1_radio)
-        layout.addWidget(self.q2_answer2_radio)
-        layout.addWidget(self.q2_answer3_radio)
+        layout.addWidget(self.slider_q2)
+        #layout.addWidget(self.q2_answer1_radio)
+        #layout.addWidget(self.q2_answer2_radio)
+        #layout.addWidget(self.q2_answer3_radio)
         layout.addWidget(self.question3)
-        layout.addWidget(self.q3_answer1_radio)
-        layout.addWidget(self.q3_answer2_radio)
-        layout.addWidget(self.q3_answer3_radio)
+        layout.addWidget(self.slider_q3)
+        #layout.addWidget(self.q3_answer1_radio)
+        #layout.addWidget(self.q3_answer2_radio)
+        #layout.addWidget(self.q3_answer3_radio)
         layout.addWidget(self.submitButton)
 
         self.setLayout(layout)
 
     def submitAnswers(self):
-        selected_button_1 = self.q1_buttonGroup.checkedButton()
-        selected_button_2 = self.q2_buttonGroup.checkedButton()
-        selected_button_3 = self.q3_buttonGroup.checkedButton()
-        if (selected_button_1):
-            if(selected_button_2):
-                if(selected_button_3):
-                        answer_1 = selected_button_1.text()
-                        answer_2 = selected_button_2.text()
-                        answer_3 = selected_button_3.text()
-                else:
-                    QMessageBox.warning(self, "Submission", "Please select an answer in block 3.")
-            else:
-                QMessageBox.warning(self, "Submission", "Please select an answer in block 2")
-        
-
-            data = [
-            ["Answer 1: ", answer_1],
-            ["Answer 2: ", answer_2],
-            ["Answer 3: ", answer_3]
-            ]
-            self.openCSV(data)
-            message_box = QMessageBox(QMessageBox.Information, "Submission", f"Selected Answers: {answer_1, answer_2, answer_3}", QMessageBox.Close)
-            message_box.exec_()
-            self.close()
+        if (self.sliderValue_q1 is not None) and (self.sliderValue_q2 is not None) and (self.sliderValue_q3 is not None):
+            print("Selected values:", self.sliderValue_q1, self.sliderValue_q2, self.sliderValue_q3)
         else:
-            QMessageBox.warning(self, "Submission", "Please select an answer in block 1.")
+            print("No values selected")
+
+        answer_1 = self.sliderValue_q1
+        answer_2 = self.sliderValue_q2
+        answer_3 = self.sliderValue_q3
+
+        data = [
+        ["Answer 1: ", answer_1],
+        ["Answer 2: ", answer_2],
+        ["Answer 3: ", answer_3]
+        ]
+        self.openCSV(data)
+        message_box = QMessageBox(QMessageBox.Information, "Submission", f"Selected Answers: {answer_1, answer_2, answer_3}", QMessageBox.Close)
+        message_box.exec_()
+        self.close()
 
     def openCSV(self, data):
         csv_file = "test_new.csv"
@@ -279,6 +302,14 @@ class SlideWidget(QWidget):
         with open(csv_file, mode='w', newline='') as file:
             pass 
 
+    def updateSlider1Value(self, value):
+        self.sliderValue_q1 = value
+
+    def updateSlider2Value(self, value):
+        self.sliderValue_q2 = value
+
+    def updateSlider3Value(self, value):
+        self.sliderValue_q3 = value
 
 def run_video_player(videoPlayer):
     videoPlayer.show()
@@ -286,7 +317,7 @@ def run_video_player(videoPlayer):
 def run_blink_detector(blinkDetector):
     blinkDetector.run()
 
-
+"""
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     blinkDetector = BlinkDetector()
@@ -298,6 +329,31 @@ if __name__ == '__main__':
 
     blink_detector_thread.start()
     video_player_thread.start()
+
+    blink_detector_thread.join()
+    video_player_thread.join()
+
+    sys.exit(app.exec_())
+    """
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    blinkDetector = BlinkDetector()
+    videoPlayer = VideoPlayer(blinkDetector)
+    videoPlayer.openFile()
+
+    blink_detector_thread = threading.Thread(target=run_blink_detector, args=(blinkDetector,))
+    video_player_thread = threading.Thread(target=run_video_player, args=(videoPlayer,))
+
+    blink_detector_thread.start()
+    video_player_thread.start()
+
+    # Wait for the threads to complete or until the video player is closed
+    while videoPlayer.isVisible():
+        app.processEvents()
+
+    # If the video player is closed, stop the blink detector
+    blinkDetector.stop()
 
     blink_detector_thread.join()
     video_player_thread.join()
