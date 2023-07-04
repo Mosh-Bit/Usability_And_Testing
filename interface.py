@@ -3,7 +3,7 @@ import csv
 import time
 import threading
 from Blink.blink_detector import BlinkDetector
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QRadioButton, QButtonGroup, QMessageBox, QHBoxLayout, QSlider, QStyle, QFileDialog, QSizePolicy, QMainWindow, QSizePolicy, QAction, qApp, QSlider
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QRadioButton, QButtonGroup, QMessageBox, QHBoxLayout, QSlider, QStyle, QFileDialog, QSizePolicy, QMainWindow, QSizePolicy, QAction, qApp, QSlider, QInputDialog
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtCore import Qt, QUrl
@@ -94,14 +94,13 @@ class VideoPlayer(QWidget):
         self.fullScreenShortcut = QShortcut(QKeySequence(Qt.Key_F), self)
         self.fullScreenShortcut.activated.connect(self.makeFullScreen)
 
-        self.nextSlide = None  # Initialize as None
+        self.nextSlide = None
     
     def openFile(self):
         file, _ = QFileDialog.getOpenFileName(self, "Open Video", "Videos/")
         if file != '':
             self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(file)))
             self.playButton.setEnabled(True)
-            # self.pauseButton.setEnabled(True)
             self.nextButton.setEnabled(True)
 
     def playVideo(self):
@@ -173,8 +172,11 @@ class SlideWidget(QWidget):
 
         self.blink_detector = blink
         self.setWindowTitle("Slide")
-        self.setGeometry(100, 100, 400, 300)
+        #self.setGeometry(100, 100, 400, 300)
+        layout = QVBoxLayout()
         self.showFullScreen
+        self.username = "default name"
+        self.username, ok = QInputDialog.getText(None, "Enter Username", "Username:")
 
         # slider answers
         self.sliderValue_q1 = None
@@ -183,26 +185,83 @@ class SlideWidget(QWidget):
 
         self.question1 = QLabel("Question 1: General interest in the product category")
 
-        #self.q1_answer1_radio = QRadioButton("Agree")
-        #self.q1_answer2_radio = QRadioButton("Don't Agree")
-        #self.q1_answer3_radio = QRadioButton("Neutral")
-        # think about slider
+        self.minimumQ = 0
+        self.maximumQ = 10
         self.slider_q1 = QSlider(Qt.Horizontal)
-        self.slider_q1.setMinimum(1)
-        self.slider_q1.setMaximum(4)
+        self.slider_q1.setMinimum(self.minimumQ)
+        self.slider_q1.setMaximum(self.maximumQ)
         self.slider_q1.setTickInterval(1)
         self.slider_q1.setTickPosition(QSlider.TicksBelow)
         self.slider_q1.valueChanged.connect(self.updateSlider1Value)
+        self.result_label_q1 = QLabel('', self)
+
+        self.slider_q1.setStyleSheet(
+            """
+            QSlider {
+                background-color: #e0e0e0;
+                height: 10px;
+            }
+
+            QSlider::groove:horizontal {
+                background-color: #bdbdbd;
+                height: 6px;
+                border-radius: 3px;
+            }
+
+            QSlider::handle:horizontal {
+                background-color: #4CAF50;
+                width: 20px;  /* Adjust handle width to make it bigger */
+                margin: -7px 0;  /* Adjust handle margin to center it vertically */
+                border-radius: 10px;  /* Adjust border-radius to make it circular */
+            }
+
+            QSlider::handle:horizontal:hover {
+                background-color: #45a049;
+            }
+
+            QSlider::sub-page:horizontal {
+                background-color: #4CAF50;
+                height: 6px;
+                border-radius: 3px;
+            }
+
+            QSlider::add-page:horizontal {
+                background-color: #bdbdbd;
+                height: 6px;
+                border-radius: 3px;
+            }
+
+            QSlider::sub-page:horizontal:disabled,
+            QSlider::add-page:horizontal:disabled {
+                background-color: #dcdcdc;
+            }
+
+            QSlider::tick-mark:horizontal {
+                width: 1px;
+                height: 10px;
+                background-color: #000000;
+            }
+
+            QSlider::tick-position:top,
+            QSlider::tick-position:bottom {
+                margin-top: -15px;  /* Adjust margin to make room for the tick number labels */
+            }
+
+            QSlider::sub-page:horizontal:disabled {
+                background-color: #dcdcdc;
+            }
+
+            QSlider::handle:horizontal:focus {
+                border: 1px solid #4CAF50;
+            }
+            """
+        )
 
         self.question2 = QLabel("Question 2: Was it interesting to watch?")
 
-        #self.q2_answer1_radio = QRadioButton("Yes")
-        #self.q2_answer2_radio = QRadioButton("No")
-        #self.q2_answer3_radio = QRadioButton("Neutral")
-        # remove neutral
         self.slider_q2 = QSlider(Qt.Horizontal)
-        self.slider_q2.setMinimum(1)
-        self.slider_q2.setMaximum(4)
+        self.slider_q2.setMinimum(self.minimumQ)
+        self.slider_q2.setMaximum(self.maximumQ)
         self.slider_q2.setTickInterval(1)
         self.slider_q2.setTickPosition(QSlider.TicksBelow)
         self.slider_q2.valueChanged.connect(self.updateSlider2Value)
@@ -210,25 +269,11 @@ class SlideWidget(QWidget):
         self.question3 = QLabel("Question 3: Positive or Negative Emotion?")
 
         self.slider_q3 = QSlider(Qt.Horizontal)
-        self.slider_q3.setMinimum(1)
-        self.slider_q3.setMaximum(4)
+        self.slider_q3.setMinimum(self.minimumQ)
+        self.slider_q3.setMaximum(self.maximumQ)
         self.slider_q3.setTickInterval(1)
         self.slider_q3.setTickPosition(QSlider.TicksBelow)
         self.slider_q3.valueChanged.connect(self.updateSlider3Value)
-
-        #self.q1_buttonGroup = QButtonGroup()
-        #self.q2_buttonGroup = QButtonGroup()
-        #self.q3_buttonGroup = QButtonGroup()
-
-        #self.q1_buttonGroup.addButton(self.q1_answer1_radio)
-        #self.q1_buttonGroup.addButton(self.q1_answer2_radio)
-        #self.q1_buttonGroup.addButton(self.q1_answer3_radio)
-        #self.q2_buttonGroup.addButton(self.q2_answer1_radio)
-        #self.q2_buttonGroup.addButton(self.q2_answer2_radio)
-        #self.q2_buttonGroup.addButton(self.q2_answer3_radio)
-        #self.q3_buttonGroup.addButton(self.q3_answer1_radio)
-        #self.q3_buttonGroup.addButton(self.q3_answer2_radio)
-        #self.q3_buttonGroup.addButton(self.q3_answer3_radio)
 
         self.submitButton = QPushButton("Submit")
         self.submitButton.clicked.connect(self.submitAnswers)
@@ -248,44 +293,42 @@ class SlideWidget(QWidget):
             """
         )
 
-        layout = QVBoxLayout()
+        self.setLayout(layout)
         layout.addWidget(self.question1)
         layout.addWidget(self.slider_q1)
-        #layout.addWidget(self.q1_answer1_radio)
-        #layout.addWidget(self.q1_answer2_radio)
-        #layout.addWidget(self.q1_answer3_radio)
+        layout.addWidget(self.result_label_q1)
+
         layout.addWidget(self.question2)
         layout.addWidget(self.slider_q2)
-        #layout.addWidget(self.q2_answer1_radio)
-        #layout.addWidget(self.q2_answer2_radio)
-        #layout.addWidget(self.q2_answer3_radio)
+
         layout.addWidget(self.question3)
         layout.addWidget(self.slider_q3)
-        #layout.addWidget(self.q3_answer1_radio)
-        #layout.addWidget(self.q3_answer2_radio)
-        #layout.addWidget(self.q3_answer3_radio)
+
         layout.addWidget(self.submitButton)
 
         self.setLayout(layout)
 
     def submitAnswers(self):
-        if (self.sliderValue_q1 is not None) and (self.sliderValue_q2 is not None) and (self.sliderValue_q3 is not None):
-            print("Selected values:", self.sliderValue_q1, self.sliderValue_q2, self.sliderValue_q3)
-        else:
-            print("No values selected")
+        message_box = None
+        data = None
 
         answer_1 = self.sliderValue_q1
         answer_2 = self.sliderValue_q2
         answer_3 = self.sliderValue_q3
 
-        data = [
-        ["Answer 1: ", answer_1],
-        ["Answer 2: ", answer_2],
-        ["Answer 3: ", answer_3]
-        ]
+        if (self.sliderValue_q1 is not None) and (self.sliderValue_q2 is not None) and (self.sliderValue_q3 is not None) and (self.username != None):
+            print("Selected values:", self.sliderValue_q1, self.sliderValue_q2, self.sliderValue_q3)
+            message_box = QMessageBox(QMessageBox.Information, "Submission", f"User & Selected Answers: {self.username, answer_1, answer_2, answer_3}", QMessageBox.Close)
+            data = [
+                ["Username: ", self.username],
+                ["Answer 1: ", answer_1],
+                ["Answer 2: ", answer_2],
+                ["Answer 3: ", answer_3]
+            ]
+            message_box.exec_()
+        else:
+            print("No values selected or no user name!")
         self.openCSV(data)
-        message_box = QMessageBox(QMessageBox.Information, "Submission", f"Selected Answers: {answer_1, answer_2, answer_3}", QMessageBox.Close)
-        message_box.exec_()
         self.close()
 
     def openCSV(self, data):
@@ -304,6 +347,7 @@ class SlideWidget(QWidget):
 
     def updateSlider1Value(self, value):
         self.sliderValue_q1 = value
+        self.result_label_q1.setText(f'Current Value: {value}')
 
     def updateSlider2Value(self, value):
         self.sliderValue_q2 = value
@@ -317,25 +361,6 @@ def run_video_player(videoPlayer):
 def run_blink_detector(blinkDetector):
     blinkDetector.run()
 
-"""
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    blinkDetector = BlinkDetector()
-    videoPlayer =  VideoPlayer(blinkDetector)
-    videoPlayer.openFile()
-
-    blink_detector_thread = threading.Thread(target=run_blink_detector(blinkDetector))
-    video_player_thread = threading.Thread(target=run_video_player(videoPlayer))
-
-    blink_detector_thread.start()
-    video_player_thread.start()
-
-    blink_detector_thread.join()
-    video_player_thread.join()
-
-    sys.exit(app.exec_())
-    """
-
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     blinkDetector = BlinkDetector()
@@ -345,6 +370,8 @@ if __name__ == '__main__':
     blink_detector_thread = threading.Thread(target=run_blink_detector, args=(blinkDetector,))
     video_player_thread = threading.Thread(target=run_video_player, args=(videoPlayer,))
 
+    videoPlayer.mediaPlayer.stateChanged.connect(lambda state: blinkDetector.stop() if state == QMediaPlayer.StoppedState else None)
+
     blink_detector_thread.start()
     video_player_thread.start()
 
@@ -353,7 +380,7 @@ if __name__ == '__main__':
         app.processEvents()
 
     # If the video player is closed, stop the blink detector
-    blinkDetector.stop()
+    #blinkDetector.stop()
 
     blink_detector_thread.join()
     video_player_thread.join()

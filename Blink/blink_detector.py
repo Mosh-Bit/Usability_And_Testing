@@ -4,6 +4,7 @@ import numpy as np
 import math
 import csv
 import time
+from datetime import timedelta
 
 """
     Taken from @Norina Grosch
@@ -31,7 +32,8 @@ class BlinkDetector:
         self.time_passed = time.time()
 
     def stop(self):
-        self.file.close()
+        print("Blink Detector stopped")
+        #self.file.close()
         self.cap.release()
 
     def get_face_orientation(self, results, img):
@@ -150,7 +152,7 @@ class BlinkDetector:
 
     def run(self):
         self.cap = cv2.VideoCapture(0)
-        self.file = open("test_new.csv", 'w', newline='')
+        self.file = open("test_new_blink.csv", 'w', newline='')
         self.writer = csv.writer(self.file, delimiter=';')
         self.writer.writerow(['time', 'blink', 'ratio', 'ratio_r', 'ratio_l', 'counted', 'orientation',
                               'still_closed', 'blink_length'])
@@ -212,8 +214,8 @@ class BlinkDetector:
             if cv2.waitKey(5) & 0xFF == 27:
                 break
 
-        self.file.close()
         self.cap.release()
+        self.file.close()
 
 if __name__ == '__main__':
     blink_detector = BlinkDetector()

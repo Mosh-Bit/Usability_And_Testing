@@ -188,7 +188,7 @@ if __name__ == '__main__':
     ratio, ratio_r, ratio_l = 0, 0 ,0
 
     # Open file for data storage
-    file = open("test_new.csv", 'w', newline='')
+    file = open("test_new_blink_orient.csv", 'w', newline='')
     writer = csv.writer(file, delimiter=';')
     # header
     writer.writerow(['time','blink','ratio', 'ratio_r', 'ratio_l', 'counted', 'orientation', 'still_closed', 'blink_length'])
