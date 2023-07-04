@@ -265,6 +265,9 @@ class SlideWidget(QWidget):
         self.slider_q2.setTickInterval(1)
         self.slider_q2.setTickPosition(QSlider.TicksBelow)
         self.slider_q2.valueChanged.connect(self.updateSlider2Value)
+        self.slider_q2.setStyleSheet(self.slider_q1.styleSheet())
+        self.result_label_q2 = QLabel('', self)
+
 
         self.question3 = QLabel("Question 3: Positive or Negative Emotion?")
 
@@ -274,6 +277,8 @@ class SlideWidget(QWidget):
         self.slider_q3.setTickInterval(1)
         self.slider_q3.setTickPosition(QSlider.TicksBelow)
         self.slider_q3.valueChanged.connect(self.updateSlider3Value)
+        self.slider_q3.setStyleSheet(self.slider_q1.styleSheet())
+        self.result_label_q3 = QLabel('', self)
 
         self.submitButton = QPushButton("Submit")
         self.submitButton.clicked.connect(self.submitAnswers)
@@ -300,9 +305,11 @@ class SlideWidget(QWidget):
 
         layout.addWidget(self.question2)
         layout.addWidget(self.slider_q2)
+        layout.addWidget(self.result_label_q2)
 
         layout.addWidget(self.question3)
         layout.addWidget(self.slider_q3)
+        layout.addWidget(self.result_label_q3)
 
         layout.addWidget(self.submitButton)
 
@@ -351,9 +358,11 @@ class SlideWidget(QWidget):
 
     def updateSlider2Value(self, value):
         self.sliderValue_q2 = value
+        self.result_label_q2.setText(f'Current Value: {value}')
 
     def updateSlider3Value(self, value):
         self.sliderValue_q3 = value
+        self.result_label_q3.setText(f'Current Value: {value}')
 
 def run_video_player(videoPlayer):
     videoPlayer.show()
