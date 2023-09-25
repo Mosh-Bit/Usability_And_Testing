@@ -4,7 +4,8 @@ import numpy as np
 import math
 import csv
 import time
-from datetime import timedelta
+# from datetime import timedelta
+from datetime import datetime
 
 """
     Taken from @Norina Grosch
@@ -30,6 +31,8 @@ class BlinkDetector:
         self.true_blink = False
         self.blink_len = 0
         self.time_passed = time.time()
+        # self.time_passed = datetime.now().strftime('%H:%M:%S.%f') 
+        #self.time_passed = datetime.now()
 
     def stop(self):
         print("Blink Detector stopped")

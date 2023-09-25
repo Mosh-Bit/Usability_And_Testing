@@ -7,10 +7,9 @@ from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLa
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtCore import Qt, QUrl
-from PyQt5.QtGui import QKeySequence
+from PyQt5.QtGui import QKeySequence, QFont
 from PyQt5.QtWidgets import QShortcut
 from PyQt5.QtCore import QTime
-
 """ 
 Sources:
     for Video & Audio encodings:
@@ -184,6 +183,9 @@ class SlideWidget(QWidget):
         self.sliderValue_q3 = None
 
         self.question1 = QLabel("Question 1: General interest in the product category")
+        font = QFont()
+        font.setPointSize(16) 
+        self.question1.setFont(font)
 
         self.minimumQ = 0
         self.maximumQ = 10
@@ -257,7 +259,8 @@ class SlideWidget(QWidget):
             """
         )
 
-        self.question2 = QLabel("Question 2: Was it interesting to watch?")
+        self.question2 = QLabel("Question 2: Was it interesting to watch?") 
+        self.question2.setFont(font)
 
         self.slider_q2 = QSlider(Qt.Horizontal)
         self.slider_q2.setMinimum(self.minimumQ)
@@ -270,6 +273,7 @@ class SlideWidget(QWidget):
 
 
         self.question3 = QLabel("Question 3: Positive or Negative Emotion?")
+        self.question3.setFont(font)
 
         self.slider_q3 = QSlider(Qt.Horizontal)
         self.slider_q3.setMinimum(self.minimumQ)
@@ -328,9 +332,9 @@ class SlideWidget(QWidget):
             message_box = QMessageBox(QMessageBox.Information, "Submission", f"User & Selected Answers: {self.username, answer_1, answer_2, answer_3}", QMessageBox.Close)
             data = [
                 ["Username: ", self.username],
-                ["Answer 1: ", answer_1],
-                ["Answer 2: ", answer_2],
-                ["Answer 3: ", answer_3]
+                ["Answer 1: ", self.sliderValue_q1],
+                ["Answer 2: ", self.sliderValue_q2],
+                ["Answer 3: ", self.sliderValue_q3]
             ]
             message_box.exec_()
         else:
@@ -341,8 +345,9 @@ class SlideWidget(QWidget):
     def openCSV(self, data):
         csv_file = "test_new.csv"
         self.clearCSV(csv_file)
-        if(len(data) == 0):
-            QMessageBox.warning(self, "Error", "Something went wrong, data is empty!!")
+        print("Data comming from openCSV" , data)
+        #if all(item[1] is not None for item in data):
+        #    QMessageBox.warning(self, "Error", "Something went wrong, data is empty!!")
         with open(csv_file, mode='a', newline='') as file:
             writer = csv.writer(file)
             for row in data:
