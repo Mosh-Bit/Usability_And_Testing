@@ -283,20 +283,6 @@ class SlideWidget(QWidget):
         self.result_label_q2 = QLabel('', self)
         self.result_label_q2.setFont(font)
 
-
-        #self.question3 = QLabel("Question 3: Positive or Negative Emotion?")
-        #self.question3.setFont(font)
-
-        #self.slider_q3 = QSlider(Qt.Horizontal)
-        #self.slider_q3.setMinimum(self.minimumQ)
-        #self.slider_q3.setMaximum(self.maximumQ)
-        #self.slider_q3.setTickInterval(1)
-        #self.slider_q3.setTickPosition(QSlider.TicksBelow)
-        #self.slider_q3.valueChanged.connect(self.updateSlider3Value)
-        #self.slider_q3.setStyleSheet(self.slider_q1.styleSheet())
-        #self.result_label_q3 = QLabel('', self)
-        #self.result_label_q3.setFont(font)
-
         self.submitButton = QPushButton("Submit")
         self.submitButton.clicked.connect(self.submitAnswers)
         self.submitButton.setStyleSheet(
@@ -329,10 +315,6 @@ class SlideWidget(QWidget):
         layout.addWidget(self.slider_q2)
         layout.addWidget(self.result_label_q2)
 
-        #layout.addWidget(self.question3)
-        #layout.addWidget(self.slider_q3)
-        #layout.addWidget(self.result_label_q3)
-
         layout.addWidget(self.submitButton)
 
         self.setLayout(layout)
@@ -343,7 +325,6 @@ class SlideWidget(QWidget):
         self.answer_0 = self.evaluateRadios()
         answer_1 = self.sliderValue_q1
         answer_2 = self.sliderValue_q2
-        #answer_3 = self.sliderValue_q3
 
         if (self.sliderValue_q1 is not None) and (self.sliderValue_q2 is not None) and (self.username != None):
             print("Selected values:", self.answer_0, self.sliderValue_q1, self.sliderValue_q2, self.sliderValue_q3)
@@ -364,8 +345,7 @@ class SlideWidget(QWidget):
         csv_file = "test_new.csv"
         self.clearCSV(csv_file)
         print("Data comming from openCSV" , data)
-        #if all(item[1] is not None for item in data):
-        #    QMessageBox.warning(self, "Error", "Something went wrong, data is empty!!")
+
         with open(csv_file, mode='a', newline='') as file:
             writer = csv.writer(file)
             for row in data:
@@ -415,12 +395,8 @@ if __name__ == '__main__':
     blink_detector_thread.start()
     video_player_thread.start()
 
-    # Wait for the threads to complete or until the video player is closed
     while videoPlayer.isVisible():
         app.processEvents()
-
-    # If the video player is closed, stop the blink detector
-    #blinkDetector.stop()
 
     blink_detector_thread.join()
     video_player_thread.join()
