@@ -9,7 +9,7 @@ from datetime import datetime
 
 """
     Taken from @Norina Grosch
-    only a restructured as a class!
+    only restructured as a class!
 """
 
 class BlinkDetector:
@@ -21,6 +21,7 @@ class BlinkDetector:
         self.mp_face_mesh = mp.solutions.face_mesh
         self.face_mesh = self.mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence=0.5)
         self.INITAL_TIME = time.time()
+        self.videoName = None
 
         self.blink_counter = 0
         self.ratio, self.ratio_r, self.ratio_l = 0, 0, 0
@@ -153,9 +154,15 @@ class BlinkDetector:
         start = time.time()
         return true_blink, start, elapsed
 
+    def setFileName(self, name):
+        self.videoName = name
+        print("Blink Detector video name set to: " + self.videoName)
+
     def run(self):
         self.cap = cv2.VideoCapture(0)
-        self.file = open("test_new_blink.csv", 'w', newline='')
+        current_datetime = datetime.now()
+        filename = current_datetime.strftime("%Y-%m-%d_%H-%M-%S") + self.videoName + ".csv"
+        self.file = open(filename, 'w', newline='')
         self.writer = csv.writer(self.file, delimiter=';')
         self.writer.writerow(['time', 'blink', 'ratio', 'ratio_r', 'ratio_l', 'counted', 'orientation',
                               'still_closed', 'blink_length'])

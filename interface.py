@@ -1,7 +1,9 @@
 import sys
 import csv
+import os
 import time
 import threading
+from datetime import datetime
 from Blink.blink_detector import BlinkDetector
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QRadioButton, QButtonGroup, QMessageBox, QHBoxLayout, QSlider, QStyle, QFileDialog, QSizePolicy, QMainWindow, QSizePolicy, QAction, qApp, QSlider, QInputDialog
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
@@ -26,6 +28,7 @@ class VideoPlayer(QWidget):
         self.blink_detector = blink
         # self.setGeometry(100, 100, 800, 600)
         self.showFullScreen()
+        self.videoName = "No video name set"
 
         self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)
         self.mediaPlayer.positionChanged.connect(self.updatePosition)
@@ -97,6 +100,8 @@ class VideoPlayer(QWidget):
     
     def openFile(self):
         file, _ = QFileDialog.getOpenFileName(self, "Open Video", "Videos/")
+        file_name, file_extension = os.path.splitext(os.path.basename(file))
+        self.videoName = file_name
         if file != '':
             self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(file)))
             self.playButton.setEnabled(True)
@@ -191,8 +196,6 @@ class SlideWidget(QWidget):
         self.no_radio = QRadioButton("No")
         self.yes_radio.setStyleSheet("QRadioButton { font-size: 25px; padding: 10px; }")
         self.no_radio.setStyleSheet("QRadioButton { font-size: 25px; padding: 10px; }")
-
-
 
         self.question1 = QLabel("Question 1: How interesting did you find the presentation of the shown product")
         self.question1.setFont(font)
@@ -342,7 +345,10 @@ class SlideWidget(QWidget):
         self.close()
 
     def openCSV(self, data):
-        csv_file = "test_new.csv"
+        current_datetime = datetime.now()
+        date_stamp = current_datetime.strftime("%Y-%m-%d_%H-%M-%S")
+        filename = date_stamp + self.username
+        csv_file = filename + ".csv"
         self.clearCSV(csv_file)
         print("Data comming from openCSV" , data)
 
@@ -386,6 +392,7 @@ if __name__ == '__main__':
     blinkDetector = BlinkDetector()
     videoPlayer = VideoPlayer(blinkDetector)
     videoPlayer.openFile()
+    blinkDetector.setFileName(videoPlayer.videoName)
 
     blink_detector_thread = threading.Thread(target=run_blink_detector, args=(blinkDetector,))
     video_player_thread = threading.Thread(target=run_video_player, args=(videoPlayer,))
