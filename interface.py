@@ -189,6 +189,9 @@ class SlideWidget(QWidget):
         self.question_label.setFont(font)
         self.yes_radio = QRadioButton("Yes")
         self.no_radio = QRadioButton("No")
+        self.yes_radio.setStyleSheet("QRadioButton { font-size: 25px; padding: 10px; }")
+        self.no_radio.setStyleSheet("QRadioButton { font-size: 25px; padding: 10px; }")
+
 
 
         self.question1 = QLabel("Question 1: How interesting did you find the presentation of the shown product")
@@ -344,7 +347,7 @@ class SlideWidget(QWidget):
 
         if (self.sliderValue_q1 is not None) and (self.sliderValue_q2 is not None) and (self.username != None):
             print("Selected values:", self.answer_0, self.sliderValue_q1, self.sliderValue_q2, self.sliderValue_q3)
-            message_box = QMessageBox(QMessageBox.Information, "Submission", f"User & Selected Answers: {self.username, answer_1, answer_2}", QMessageBox.Close)
+            message_box = QMessageBox(QMessageBox.Information, "Submission", f"User & Selected Answers: {self.answer_0, self.username, answer_1, answer_2}", QMessageBox.Close)
             data = [
                 ["Username: ", self.username],
                 ["Answer 0:", self.answer_0],
