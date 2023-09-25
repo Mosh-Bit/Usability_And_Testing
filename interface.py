@@ -173,22 +173,29 @@ class SlideWidget(QWidget):
         self.setWindowTitle("Slide")
         #self.setGeometry(100, 100, 400, 300)
         layout = QVBoxLayout()
+        font = QFont()
+        font.setPointSize(16) 
         self.showFullScreen
         self.username = "default name"
         self.username, ok = QInputDialog.getText(None, "Enter Username", "Username:")
 
         # slider answers
+        self.answer_0 = None
         self.sliderValue_q1 = None
         self.sliderValue_q2 = None
         self.sliderValue_q3 = None
 
-        self.question1 = QLabel("Question 1: General interest in the product category")
-        font = QFont()
-        font.setPointSize(16) 
+        self.question_label = QLabel("Did you see this commercial before?")
+        self.question_label.setFont(font)
+        self.yes_radio = QRadioButton("Yes")
+        self.no_radio = QRadioButton("No")
+
+
+        self.question1 = QLabel("Question 1: How interesting did you find the presentation of the shown product")
         self.question1.setFont(font)
 
-        self.minimumQ = 0
-        self.maximumQ = 10
+        self.minimumQ = 1
+        self.maximumQ = 5
         self.slider_q1 = QSlider(Qt.Horizontal)
         self.slider_q1.setMinimum(self.minimumQ)
         self.slider_q1.setMaximum(self.maximumQ)
@@ -196,6 +203,7 @@ class SlideWidget(QWidget):
         self.slider_q1.setTickPosition(QSlider.TicksBelow)
         self.slider_q1.valueChanged.connect(self.updateSlider1Value)
         self.result_label_q1 = QLabel('', self)
+        self.result_label_q1.setFont(font)
 
         self.slider_q1.setStyleSheet(
             """
@@ -259,7 +267,7 @@ class SlideWidget(QWidget):
             """
         )
 
-        self.question2 = QLabel("Question 2: Was it interesting to watch?") 
+        self.question2 = QLabel("Question 2: How much are you generally interested in the presented product category or even this very specific product?") 
         self.question2.setFont(font)
 
         self.slider_q2 = QSlider(Qt.Horizontal)
@@ -270,19 +278,21 @@ class SlideWidget(QWidget):
         self.slider_q2.valueChanged.connect(self.updateSlider2Value)
         self.slider_q2.setStyleSheet(self.slider_q1.styleSheet())
         self.result_label_q2 = QLabel('', self)
+        self.result_label_q2.setFont(font)
 
 
-        self.question3 = QLabel("Question 3: Positive or Negative Emotion?")
-        self.question3.setFont(font)
+        #self.question3 = QLabel("Question 3: Positive or Negative Emotion?")
+        #self.question3.setFont(font)
 
-        self.slider_q3 = QSlider(Qt.Horizontal)
-        self.slider_q3.setMinimum(self.minimumQ)
-        self.slider_q3.setMaximum(self.maximumQ)
-        self.slider_q3.setTickInterval(1)
-        self.slider_q3.setTickPosition(QSlider.TicksBelow)
-        self.slider_q3.valueChanged.connect(self.updateSlider3Value)
-        self.slider_q3.setStyleSheet(self.slider_q1.styleSheet())
-        self.result_label_q3 = QLabel('', self)
+        #self.slider_q3 = QSlider(Qt.Horizontal)
+        #self.slider_q3.setMinimum(self.minimumQ)
+        #self.slider_q3.setMaximum(self.maximumQ)
+        #self.slider_q3.setTickInterval(1)
+        #self.slider_q3.setTickPosition(QSlider.TicksBelow)
+        #self.slider_q3.valueChanged.connect(self.updateSlider3Value)
+        #self.slider_q3.setStyleSheet(self.slider_q1.styleSheet())
+        #self.result_label_q3 = QLabel('', self)
+        #self.result_label_q3.setFont(font)
 
         self.submitButton = QPushButton("Submit")
         self.submitButton.clicked.connect(self.submitAnswers)
@@ -303,6 +313,11 @@ class SlideWidget(QWidget):
         )
 
         self.setLayout(layout)
+
+        layout.addWidget(self.question_label)
+        layout.addWidget(self.yes_radio)
+        layout.addWidget(self.no_radio)
+
         layout.addWidget(self.question1)
         layout.addWidget(self.slider_q1)
         layout.addWidget(self.result_label_q1)
@@ -311,9 +326,9 @@ class SlideWidget(QWidget):
         layout.addWidget(self.slider_q2)
         layout.addWidget(self.result_label_q2)
 
-        layout.addWidget(self.question3)
-        layout.addWidget(self.slider_q3)
-        layout.addWidget(self.result_label_q3)
+        #layout.addWidget(self.question3)
+        #layout.addWidget(self.slider_q3)
+        #layout.addWidget(self.result_label_q3)
 
         layout.addWidget(self.submitButton)
 
@@ -322,19 +337,19 @@ class SlideWidget(QWidget):
     def submitAnswers(self):
         message_box = None
         data = None
-
+        self.answer_0 = self.evaluateRadios()
         answer_1 = self.sliderValue_q1
         answer_2 = self.sliderValue_q2
-        answer_3 = self.sliderValue_q3
+        #answer_3 = self.sliderValue_q3
 
-        if (self.sliderValue_q1 is not None) and (self.sliderValue_q2 is not None) and (self.sliderValue_q3 is not None) and (self.username != None):
-            print("Selected values:", self.sliderValue_q1, self.sliderValue_q2, self.sliderValue_q3)
-            message_box = QMessageBox(QMessageBox.Information, "Submission", f"User & Selected Answers: {self.username, answer_1, answer_2, answer_3}", QMessageBox.Close)
+        if (self.sliderValue_q1 is not None) and (self.sliderValue_q2 is not None) and (self.username != None):
+            print("Selected values:", self.answer_0, self.sliderValue_q1, self.sliderValue_q2, self.sliderValue_q3)
+            message_box = QMessageBox(QMessageBox.Information, "Submission", f"User & Selected Answers: {self.username, answer_1, answer_2}", QMessageBox.Close)
             data = [
                 ["Username: ", self.username],
+                ["Answer 0:", self.answer_0],
                 ["Answer 1: ", self.sliderValue_q1],
-                ["Answer 2: ", self.sliderValue_q2],
-                ["Answer 3: ", self.sliderValue_q3]
+                ["Answer 2: ", self.sliderValue_q2]
             ]
             message_box.exec_()
         else:
@@ -352,6 +367,14 @@ class SlideWidget(QWidget):
             writer = csv.writer(file)
             for row in data:
                 writer.writerow(row)
+
+    def evaluateRadios(self):
+        answer = "No [yes/no] selection"
+        if self.yes_radio.isChecked():
+            answer = "Yes"
+        elif self.no_radio.isChecked():
+            answer = "No"
+        return answer
 
     def clearCSV(self, csv_file):
         with open(csv_file, mode='w', newline='') as file:
