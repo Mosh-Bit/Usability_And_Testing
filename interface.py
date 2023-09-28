@@ -186,9 +186,9 @@ class SlideWidget(QWidget):
 
         # slider answers
         self.answer_0 = None
-        self.sliderValue_q1 = None
-        self.sliderValue_q2 = None
-        self.sliderValue_q3 = None
+        self.sliderValue_q1 = 1
+        self.sliderValue_q2 = 1
+        self.sliderValue_q3 = 1
 
         self.question_label = QLabel("Did you see this commercial before?")
         self.question_label.setFont(font)
@@ -226,7 +226,7 @@ class SlideWidget(QWidget):
 
             QSlider::handle:horizontal {
                 background-color: #4CAF50;
-                width: 20px;  /* Adjust handle width to make it bigger */
+                width: 50px;  /* Adjust handle width to make it bigger */
                 margin: -7px 0;  /* Adjust handle margin to center it vertically */
                 border-radius: 10px;  /* Adjust border-radius to make it circular */
             }
@@ -253,8 +253,8 @@ class SlideWidget(QWidget):
             }
 
             QSlider::tick-mark:horizontal {
-                width: 1px;
-                height: 10px;
+                width: 20px;
+                height: 20px;
                 background-color: #000000;
             }
 
